@@ -19,6 +19,7 @@ env:
   REPO_BRANCH: "${{ github.repository }} master" # target repository & branch e.g. 'dummy/mytargetrepo main'
   MOBILE_LIGHTHOUSE_PARAMS: "--only-categories=performance,accessibility,best-practices,seo --throttling.cpuSlowdownMultiplier=2"
   DESKTOP_LIGHTHOUSE_PARAMS: "--only-categories=performance,accessibility,best-practices,seo --preset=desktop --throttling.cpuSlowdownMultiplier=1"
+  LIGHTHOUSE_BADGER_TOKEN_SET: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.lighthouse_badger_token != '' || secrets.LIGHTHOUSE_BADGER_TOKEN != '' }}
 
 # TRIGGERS
 on:
@@ -34,8 +35,22 @@ on:
 ########################################################################
 
 jobs:
+  determine-secret:
+    runs-on: ubuntu-latest
+    outputs:
+      has-secret: ${{ steps.check.outputs.present }}
+    steps:
+      - id: check
+        run: |
+          if [ -z "${{ secrets.LIGHTHOUSE_BADGER_TOKEN }}" ]; then
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+
   lighthouse-badger-easy:
-    if: ${{ secrets.LIGHTHOUSE_BADGER_TOKEN != '' }}
+    needs: determine-secret
+    if: ${{ needs.determine-secret.outputs.has-secret == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
