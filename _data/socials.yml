@@ -1,0 +1,8 @@
+# this file contains the social media links and usernames of the author
+# the commented lines are the default social media links supported by the template
+# the socials will be displayed in the order they are defined here
+
+email: ccitren@stanford.edu
+github_username: colecitrenbaum # update with your GitHub username
+linkedin_username: cole-citrenbaum-26b18820a
+rss_icon: true # comment this line to hide the RSS icon
